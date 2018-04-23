@@ -129,7 +129,7 @@ public final class JavaApiPrefabValues {
         addValues(Throwable.class, new Throwable(), new Throwable(), new Throwable());
         addValues(UUID.class, new UUID(0, -1), new UUID(1, 0), new UUID(0, -1));
 
-        addFactory(ThreadLocal.class, new ThreadLocalFactory());
+        addFactory(ThreadLocal.class, new SimpleGenericFactory<>(a -> ThreadLocal.withInitial(() -> a)));
 
         // Constructing InetAddress reflectively, because it might throw an awkward exception otherwise.
         ConditionalInstantiator inetAddress = new ConditionalInstantiator("java.net.InetAddress");
@@ -310,6 +310,9 @@ public final class JavaApiPrefabValues {
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     private void addJava8ApiClasses() {
+        addFactory(Optional.class, new SimpleGenericFactory<>(Optional::of));
+        addFactory(CompletableFuture.class, new SimpleGenericFactory<>(ignored -> new CompletableFuture<>()));
+
         addValues(LocalDateTime.class, LocalDateTime.MIN, LocalDateTime.MAX, LocalDateTime.MIN);
         addValues(LocalDate.class, LocalDate.MIN, LocalDate.MAX, LocalDate.MIN);
         addValues(LocalTime.class, LocalTime.MIN, LocalTime.MAX, LocalDate.MIN);
@@ -317,20 +320,10 @@ public final class JavaApiPrefabValues {
         addValues(ZoneOffset.class, ZoneOffset.ofHours(1), ZoneOffset.ofHours(-1), ZoneOffset.ofHours(1));
         addValues(DateTimeFormatter.class, DateTimeFormatter.ISO_TIME, DateTimeFormatter.ISO_DATE, DateTimeFormatter.ISO_TIME);
         addValues(StampedLock.class, new StampedLock(), new StampedLock(), new StampedLock());
-
         addValues(ZonedDateTime.class,
             ZonedDateTime.parse("2017-12-13T10:15:30+01:00"),
             ZonedDateTime.parse("2016-11-12T09:14:29-01:00"),
             ZonedDateTime.parse("2017-12-13T10:15:30+01:00"));
-
-        String optional = "java.util.Optional";
-        addFactory(classForName(optional), new ReflectiveGenericContainerFactory(optional, "of", Object.class));
-
-        ConditionalInstantiator completableFuture = new ConditionalInstantiator("java.util.concurrent.CompletableFuture");
-        addValues(completableFuture.resolve(),
-                completableFuture.instantiate(classes(), objects()),
-                completableFuture.instantiate(classes(), objects()),
-                completableFuture.instantiate(classes(), objects()));
     }
 
     private void addJavaFxClasses() {
