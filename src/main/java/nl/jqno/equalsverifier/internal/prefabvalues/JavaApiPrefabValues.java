@@ -139,7 +139,7 @@ public final class JavaApiPrefabValues {
         addValues(Throwable.class, new Throwable(), new Throwable(), new Throwable());
         addValues(UUID.class, new UUID(0, -1), new UUID(1, 0), new UUID(0, -1));
 
-        addFactory(ThreadLocal.class, arity1(a -> ThreadLocal.withInitial(() -> a), null));
+        addFactory(ThreadLocal.class, simple(a -> ThreadLocal.withInitial(() -> a), null));
 
         // Constructing InetAddress reflectively, because it might throw an awkward exception otherwise.
         ConditionalInstantiator inetAddress = new ConditionalInstantiator("java.net.InetAddress");
@@ -151,7 +151,7 @@ public final class JavaApiPrefabValues {
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     private void addCollection() {
-        addFactory(Iterable.class, arity1(a -> {
+        addFactory(Iterable.class, simple(a -> {
             Collection coll = new ArrayList<>();
             coll.add(a);
             return coll;
@@ -239,8 +239,8 @@ public final class JavaApiPrefabValues {
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     private void addJava8ApiClasses() {
-        addFactory(Optional.class, arity1(Optional::of, Optional::empty));
-        addFactory(CompletableFuture.class, arity1(ignored -> new CompletableFuture<>(), CompletableFuture::new));
+        addFactory(Optional.class, simple(Optional::of, Optional::empty));
+        addFactory(CompletableFuture.class, simple(ignored -> new CompletableFuture<>(), CompletableFuture::new));
 
         addValues(LocalDateTime.class, LocalDateTime.MIN, LocalDateTime.MAX, LocalDateTime.MIN);
         addValues(LocalDate.class, LocalDate.MIN, LocalDate.MAX, LocalDate.MIN);
